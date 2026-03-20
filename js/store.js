@@ -1,12 +1,13 @@
 // STORE.JS - SKIN STORE SYSTEM (150+ lines)
 const birdImages = {};
 const skins = [
-    {name:"Classic Bird", file:"images/bird1.png", unlockScore:0, pipeColor:"#00c853", groundColor:"#8B4513"},
-    {name:"Mango Bird", file:"images/bird2.png", unlockScore:10, pipeColor:"#FFA500", groundColor:"#FFCC80"},
-    {name:"Happy Parrot", file:"images/bird3.png", unlockScore:20, pipeColor:"#ff4081", groundColor:"#f48fb1"},
-    {name:"Angry Bird", file:"images/bird4.png", unlockScore:30, pipeColor:"#ff1744", groundColor:"#d50000"},
-    {name:"Shadow Crow", file:"images/bird5.png", unlockScore:50, pipeColor:"#333333", groundColor:"#555555"}
+    {name:"Classic Bird", file:"Picsart_26-02-26_17-30-25-252.png", unlockScore:0, pipeColor:"#00c853", groundColor:"#8B4513"},
+    {name:"Mango Bird", file:"Picsart_26-02-27_01-28-33-302.png", unlockScore:10, pipeColor:"#FFA500", groundColor:"#FFCC80"},
+    {name:"Happy Parrot", file:"Picsart_26-02-27_10-16-34-761.png", unlockScore:20, pipeColor:"#ff4081", groundColor:"#f48fb1"},
+    {name:"Angry Bird", file:"Picsart_26-02-27_10-15-45-688.png", unlockScore:30, pipeColor:"#ff1744", groundColor:"#d50000"},
+    {name:"Shadow Crow", file:"Picsart_26-02-27_20-37-59-368.png", unlockScore:50, pipeColor:"#333333", groundColor:"#555555"}
 ];
+
 
 let skinData = JSON.parse(localStorage.getItem("fluppySkins")) || {};
 let selectedSkinName = localStorage.getItem("selectedSkin") || "Classic Bird";
