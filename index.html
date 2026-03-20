@@ -1,159 +1,125 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Fluppy Bird - PERFECT FIXED</title>
+<title>Fluppy Bird - 100% FIXED</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{ margin:0; overflow:hidden; font-family:Arial, sans-serif; background:skyblue;}
-canvas{ display:block; }
+canvas{ display:block; z-index:1; }
 
-#splashScreen{ 
+#splashScreen, #titleScreen, #settingsScreen, #storeScreen, #gameOverOverlay{ 
     position:absolute; width:100%; height:100%; top:0; left:0; 
     display:flex; flex-direction:column; align-items:center; justify-content:center; 
-    z-index:1000; background:linear-gradient(45deg, #000, #1a1a2e); transition: opacity 0.5s; 
+    z-index:1000; transition: opacity 0.3s; 
 }
+#splashScreen{ background:linear-gradient(45deg, #000, #1a1a2e); }
 #splashScreen img{ max-width:300px; max-height:300px; border-radius:20px; box-shadow:0 10px 40px rgba(255,255,0,0.5); }
-#okBtn{ 
-    position:absolute; bottom:80px; padding:20px 50px; font-size:28px; 
-    background:linear-gradient(45deg, #4CAF50, #45a049); color:white; 
-    border:none; border-radius:25px; cursor:pointer; font-weight:bold; 
-    box-shadow:0 8px 25px rgba(0,0,0,0.4); transition:0.3s;
-}
-#okBtn:hover{ transform:scale(1.1); box-shadow:0 12px 35px rgba(0,0,0,0.5); }
-
-#titleScreen, #settingsScreen, #storeScreen{ 
-    position:absolute; width:100%; height:100%; top:0; left:0; 
-    display:flex; flex-direction:column; align-items:center; justify-content:center; 
-    z-index:100; transition: opacity 0.3s;
-}
 #titleScreen{ background: linear-gradient(45deg, skyblue, #87CEEB); }
-#titleScreen h1{ 
-    font-size:60px; color:yellow; text-shadow:4px 4px 0 black,8px 8px 0 orange; 
-    font-family:'Comic Sans MS', cursive; animation:bounce 1s infinite alternate; 
-    margin-bottom:30px;
+#settingsScreen{ background:#f0f0f0; flex-direction:row; padding-top:80px; }
+#storeScreen{ background: linear-gradient(white, #f8f9fa); padding-top:60px; }
+#gameOverOverlay{ 
+    background: linear-gradient(45deg, rgba(0,0,0,0.9), rgba(139,69,19,0.8)); 
+    color:#FFD700; text-shadow: 3px 3px 0 #000; font-family: 'Comic Sans MS', cursive;
+    opacity:0;
 }
-@keyframes bounce{0%{transform:translateY(0px);}100%{transform:translateY(-10px);}}
-#titleScreen button{ padding:15px 35px; font-size:22px; border:none; border-radius:15px; margin:10px; cursor:pointer; transition:0.3s; font-weight:bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-#titleScreen button:hover{ transform:scale(1.1) rotate(2deg); }
-#playBtn{ background:linear-gradient(45deg,#ffeb3b,#fbc02d); color:#000; font-size:24px; box-shadow:3px 3px 0 #ffa000;}
-#playBtn::before { content: "▶ "; font-size:28px; }
-#settingsBtnMain{ background:linear-gradient(45deg,#ff9800,#f57c00); color:white; box-shadow:3px 3px 0 #e65100;}
-#settingsBtnMain::before { content: "⚙ "; font-size:24px; }
-#storeBtn{ background:linear-gradient(45deg,#4fc3f7,#0288d1); color:white; box-shadow:3px 3px 0 #0277bd;}
-#storeBtn::before { content: "🛍️ "; font-size:24px; }
+#gameOverOverlay.show{ opacity:1 !important; }
 
-#settingsScreen{ background:#f0f0f0; display:none; padding-top:80px; flex-direction:row; z-index:101; }
+#okBtn, #titleScreen button, #confirmSkinBtn{ 
+    padding:15px 35px; font-size:22px; border:none; border-radius:15px; 
+    cursor:pointer; transition:0.3s; font-weight:bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+}
+#okBtn{ position:absolute; bottom:80px; background:linear-gradient(45deg, #4CAF50, #45a049); color:white; }
+#playBtn{ background:linear-gradient(45deg,#ffeb3b,#fbc02d); color:#000; font-size:24px; }
+#settingsBtnMain{ background:linear-gradient(45deg,#ff9800,#f57c00); color:white; }
+#storeBtn{ background:linear-gradient(45deg,#4fc3f7,#0288d1); color:white; }
+#confirmSkinBtn{ background:#ccc; color:white; }
+.confirmBtn.unlocked{ background: linear-gradient(45deg, #4CAF50, #45a049); }
+
+#titleScreen h1{ font-size:60px; color:yellow; text-shadow:4px 4px 0 black; animation:bounce 1s infinite alternate; }
+@keyframes bounce{0%{transform:translateY(0px);}100%{transform:translateY(-10px);}}
+
 #settingsLeft{ width:40%; padding:20px; text-align:center; }
 #settingsRight{ width:60%; padding:20px; background:rgba(255,255,255,0.95); border-radius:20px; overflow-y:auto; max-height:70vh; }
-.settingsTab{ width:100%; padding:15px; margin:10px 0; font-size:24px; border:none; border-radius:10px; cursor:pointer; background:#ddd; transition:0.3s; }
+.settingsTab{ width:100%; padding:15px; margin:10px 0; font-size:24px; border:none; border-radius:10px; cursor:pointer; background:#ddd; }
 .settingsTab.active{ background:linear-gradient(45deg,#4CAF50,#45a049); color:white; }
-#difficultyOptions, #soundOptions{ display:none; text-align:center; }
+#difficultyOptions, #soundOptions{ display:none; }
 #difficultyOptions.active, #soundOptions.active{ display:block; }
-#difficultyOptions label{ display:block; margin:15px; font-size:20px; }
-.minecraftToggle{ position:relative; width:60px; height:34px; background:#4a5568; border-radius:34px; cursor:pointer; margin:10px auto; display:block; transition:0.4s; border:2px solid #2d3748; }
-.minecraftToggle.active{ background:linear-gradient(45deg,#48bb78,#38a169); }
-.minecraftToggle::before{ content:""; position:absolute; height:26px; width:26px; left:3px; top:3px; background:#f7fafc; border-radius:50%; transition:0.4s; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+.minecraftToggle{ position:relative; width:60px; height:34px; background:#ccc; border-radius:34px; cursor:pointer; margin:10px auto; transition:0.4s; }
+.minecraftToggle.active{ background:linear-gradient(45deg,#4CAF50,#45a049); }
+.minecraftToggle::before{ content:""; position:absolute; height:26px; width:26px; left:4px; top:4px; background:white; border-radius:50%; transition:0.4s; }
 .minecraftToggle.active::before{ transform:translateX(26px); }
-#storeScreen{ display: none; background: linear-gradient(white, #f8f9fa); padding-top:60px; }
-#storeScreen h2{ margin: 15px 0; font-size: 28px; color: #333; }
-#upperSkinDisplay{ text-align: center; margin: 20px 0; }
-#upperSkinDisplay img{ width:150px; height:150px; border-radius:20px; border:4px solid #ddd; box-shadow:0 5px 20px rgba(0,0,0,0.2); }
-.skinRow{ display: flex; flex-direction: row; align-items: center; gap: 18px; margin: 20px 0; width: 95%; height: 200px; overflow-x: auto; padding: 15px 20px; scroll-behavior: smooth;}
-.skinBox{ min-width: 140px; flex-shrink: 0; text-align: center; cursor: pointer; position: relative; padding:15px; background:#fff; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); transition:0.3s;}
-.skinBox:hover{ transform:scale(1.05); box-shadow:0 8px 25px rgba(0,0,0,0.2); }
-.skinBox.selected{ border: 3px solid #4CAF50; box-shadow: 0 0 20px rgba(76,175,80,0.5); }
+
+.skinRow{ display:flex; gap:18px; width:95%; height:200px; overflow-x:auto; padding:15px; }
+.skinBox{ min-width:140px; padding:15px; background:#fff; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); cursor:pointer; text-align:center; }
+.skinBox:hover, .skinBox.selected{ border:3px solid #4CAF50; box-shadow:0 8px 25px rgba(0,0,0,0.3); }
 .skinBox img{ width:100px; height:100px; border-radius:10px; }
-.skinBox .name{ font-size:14px; font-weight:bold; color:#333; margin:5px 0; }
-.skinBox .price{ font-size:12px; color:#666; }
-.lockOverlay{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); border-radius:15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 35px; }
-#confirmSkinBtn{ padding: 15px 40px; font-size: 20px; border-radius: 25px; margin-top: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); border:none; font-weight:bold; cursor:pointer; }
-.confirmBtn.locked{ background: #ccc; color: white; cursor: not-allowed; }
-.confirmBtn.unlocked{ background: linear-gradient(45deg, #4CAF50, #45a049); color: white; }
-.backStoreBtn, .backBtn{ position: absolute; top:15px; left:15px; font-size:32px; background:transparent; color:orange; border:none; cursor:pointer; z-index:10; }
+.lockOverlay{ position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:35px; color:white; }
 
-#pauseBtn{ 
-    position:absolute; right:15px; top:15px; display:none; background:#ff9800; color:white; padding:12px 20px; min-width:80px; 
-    border:none; border-radius:12px; font-size:18px; cursor:pointer; font-weight:bold; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:50;
-}
+.backBtn, .backStoreBtn{ position:absolute; top:15px; left:15px; font-size:32px; background:transparent; color:orange; border:none; cursor:pointer; z-index:10; }
 
-#pauseResumeBtn, #pauseHomeBtn, #restartBtn, #homeBtn{ 
-    position:absolute; left:50%; transform:translateX(-50%); display:none; z-index:300; 
-    border:none; border-radius:12px; font-size:24px; cursor:pointer; font-weight:bold; 
-    padding:20px 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+#pauseBtn, #pauseResumeBtn, #pauseHomeBtn, #restartBtn, #homeBtn{ 
+    position:absolute; z-index:2000; border:none; border-radius:12px; font-size:24px; 
+    cursor:pointer; font-weight:bold; padding:20px 40px; box-shadow:0 4px 15px rgba(0,0,0,0.3);
 }
-#pauseResumeBtn{ top:35%; background:linear-gradient(45deg,#ff9800,#f57c00); color:white; }
-#pauseHomeBtn{ top:50%; background:linear-gradient(45deg,#03a9f4,#0288d1); color:white; }
-#restartBtn{ top:30%; background:linear-gradient(45deg,#ff5722,#e64a19); color:white; }
-#homeBtn{ top:45%; background:linear-gradient(45deg,#03a9f4,#0288d1); color:white; }
+#pauseBtn{ right:15px; top:15px; background:#ff9800; color:white; display:none; }
+#pauseResumeBtn{ left:50%; top:35%; transform:translateX(-50%); background:#ff9800; color:white; display:none; }
+#pauseHomeBtn{ left:50%; top:50%; transform:translateX(-50%); background:#03a9f4; color:white; display:none; }
+#restartBtn{ left:50%; top:30%; transform:translateX(-50%); background:#ff5722; color:white; display:none; }
+#homeBtn{ left:50%; top:45%; transform:translateX(-50%); background:#03a9f4; color:white; display:none; }
 
-#gameOverOverlay{ 
-    position:absolute; top:0; left:0; width:100%; height:100%; 
-    background: linear-gradient(45deg, rgba(0,0,0,0.9), rgba(139,69,19,0.8)); 
-    display:none; flex-direction:column; align-items:center; justify-content:center; 
-    z-index:250; color:#FFD700; text-shadow: 3px 3px 0 #000; font-family: 'Comic Sans MS', cursive;
-}
-#gameOverOverlay.show{ opacity:1; }
-#gameOverOverlay h2{ 
-    font-size:80px; margin:0; text-shadow: 5px 5px 0 #000, 10px 10px 0 orange; 
-    animation: glow 2s ease-in-out infinite alternate; 
-}
-@keyframes glow{ 0%{ text-shadow: 5px 5px 0 #000, 10px 10px 0 orange; } 100%{ text-shadow: 5px 5px 20px yellow, 10px 10px 0 orange; } }
-#finalScoreContainer{ font-size:60px; margin:30px 0; background:linear-gradient(45deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: pulse 1.5s infinite; }
-@keyframes pulse{ 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.05); } }
-#madeBy{ position:absolute; bottom:15px; left:15px; font-size:12px; z-index:200; color:rgba(0,0,0,0.7); font-weight:bold; }
+#finalScoreContainer{ font-size:60px; margin:30px 0; background:linear-gradient(45deg, #FFD700, #FFA500); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+#gameOverOverlay h2{ font-size:80px; margin:0; text-shadow:5px 5px 0 #000; animation:glow 2s infinite alternate; }
+@keyframes glow{0%{text-shadow:5px 5px 0 #000;}100%{text-shadow:5px 5px 20px yellow;}}
 </style>
 </head>
 <body>
 
 <div id="splashScreen">
-    <img src="Picsart_26-03-19_22-39-08-547.jpg" alt="Splash Image" onerror="this.style.display='none';">
+    <img src="Picsart_26-03-19_22-39-08-547.jpg" alt="Splash" onerror="this.style.display='none';">
     <button id="okBtn">OK</button>
 </div>
 
 <div id="titleScreen" style="display:none;">
     <h1>🕹️ Fluppy Bird</h1>
-    <button id="playBtn">Play Game</button>
-    <button id="settingsBtnMain">Settings</button>
-    <button id="storeBtn">Store</button>
+    <button id="playBtn">▶ Play Game</button>
+    <button id="settingsBtnMain">⚙ Settings</button>
+    <button id="storeBtn">🛍️ Store</button>
 </div>
 
-<div id="settingsScreen">
+<div id="settingsScreen" style="display:none;">
     <button class="backBtn">←</button>
     <div id="settingsLeft">
-        <h2 style="margin-bottom:30px;">⚙️ Settings</h2>
+        <h2>⚙️ Settings</h2>
         <button class="settingsTab active" data-tab="difficulty">Difficulty</button>
         <button class="settingsTab" data-tab="sounds">Music/Sounds</button>
     </div>
     <div id="settingsRight">
         <div id="difficultyOptions" class="active">
             <h3>Select Difficulty</h3>
-            <label style="display:block; margin:15px; font-size:20px;"><input type="radio" name="difficulty" value="Very Easy">  Very Easy</label>
-            <label style="display:block; margin:15px; font-size:20px;"><input type="radio" name="difficulty" value="Normal">  Normal</label>
-            <label style="display:block; margin:15px; font-size:20px;"><input type="radio" name="difficulty" value="Hard">  Hard</label>
+            <label><input type="radio" name="difficulty" value="Very Easy" checked> Very Easy</label><br>
+            <label><input type="radio" name="difficulty" value="Normal"> Normal</label><br>
+            <label><input type="radio" name="difficulty" value="Hard"> Hard</label>
         </div>
         <div id="soundOptions">
-            <h3 style="margin-bottom:25px;">🔊 Sound Settings</h3>
-            <label style="display:block; margin:12px 0; font-size:18px; font-weight:bold;">All Sounds <span class="minecraftToggle active" id="allSoundsToggle"></span></label>
-            <label style="display:block; margin:12px 0; font-size:16px;">Score Sound <span class="minecraftToggle active" id="scoreSoundToggle"></span></label>
-            <label style="display:block; margin:12px 0; font-size:16px;">Bird Fly <span class="minecraftToggle active" id="flySoundToggle"></span></label>
-            <label style="display:block; margin:12px 0; font-size:16px;">Countdown <span class="minecraftToggle active" id="countdownSoundToggle"></span></label>
-            <label style="display:block; margin:12px 0; font-size:16px;">Buttons <span class="minecraftToggle active" id="buttonSoundToggle"></span></label>
-            <label style="display:block; margin:12px 0; font-size:16px;">Game Over <span class="minecraftToggle active" id="gameoverSoundToggle"></span></label>
-            <label style="display:block; margin:12px 0; font-size:16px;">BG Music <span class="minecraftToggle active" id="bgMusicToggle"></span></label>
+            <h3>🔊 Sound Settings</h3>
+            <label>All Sounds <span class="minecraftToggle active" id="allSoundsToggle"></span></label>
+            <label>BG Music <span class="minecraftToggle active" id="bgMusicToggle"></span></label>
+            <label>Score <span class="minecraftToggle active" id="scoreSoundToggle"></span></label>
+            <label>Fly <span class="minecraftToggle active" id="flySoundToggle"></span></label>
         </div>
     </div>
 </div>
 
-<div id="storeScreen">
+<div id="storeScreen" style="display:none;">
     <button class="backStoreBtn">←</button>
-    <h2>🛍️ Choose Your Skin</h2>
+    <h2>🛍️ Choose Skin</h2>
     <div id="upperSkinDisplay"></div>
     <div class="skinRow" id="skinRow"></div>
     <button id="confirmSkinBtn" class="confirmBtn locked">Confirm Skin</button>
 </div>
 
 <canvas id="gameCanvas"></canvas>
+
 <button id="pauseBtn">⏸ Pause</button>
 <button id="pauseResumeBtn">▶ Resume</button>
 <button id="pauseHomeBtn">🏠 Home</button>
@@ -162,298 +128,148 @@ canvas{ display:block; }
 
 <div id="gameOverOverlay">
     <h2>GAME OVER! 😵</h2>
-    <div id="finalScoreContainer">Final Score: <span id="finalScore">0</span></div>
+    <div id="finalScoreContainer">Score: <span id="finalScore">0</span></div>
 </div>
-<div id="madeBy">Made by TROLLHUNTER 🚀</div>
 
 <script>
-const birdImages = {};
-const skins = [
-    {name:"Bird", file:"Picsart_26-02-26_17-30-25-252.png", unlockScore:0, pipeColor:"#00c853", groundColor:"#8B4513"},
-    {name:"Mango Bird", file:"Picsart_26-02-27_01-28-33-302.png", unlockScore:10, pipeColor:"#FFA500", groundColor:"#FFCC80"},
-    {name:"Happy Perrot", file:"Picsart_26-02-27_10-16-34-761.png", unlockScore:20, pipeColor:"#ff4081", groundColor:"#f48fb1"},
-    {name:"Angry Bird", file:"Picsart_26-02-27_10-15-45-688.png", unlockScore:30, pipeColor:"#ff1744", groundColor:"#d50000"},
-    {name:"Crow", file:"Picsart_26-02-27_20-37-59-368.png", unlockScore:50, pipeColor:"#333333", groundColor:"#555555"}
-];
-
-// Audio Manager
-const audio = {
-    countdown: new Audio('countdown_sound.mp3'),
-    go: new Audio('Go_sound.mp3'),
-    fly: new Audio('bird_fly_sound.mp3'),
-    button: new Audio('bottons_sound.mp3'),
-    score: new Audio('coine_sound.mp3'),
-    gameover: new Audio('game_over_sound.mp3'),
-    bgmusic: new Audio('game_bg_sound.mp3')
-};
-audio.bgmusic.loop = true;
-
-let soundSettings = JSON.parse(localStorage.getItem("fluppySoundSettings")) || {
-    all: true, bgmusic: true, score: true, fly: true, countdown: true, button: true, gameover: true
-};
-
-function playSound(soundName) {
-    if (!soundSettings.all || !soundSettings[soundName]) return;
-    try {
-        audio[soundName].currentTime = 0;
-        audio[soundName].play().catch(() => {});
-    } catch(e) {}
-}
-
-function toggleAudio(elementId, settingName) {
-    soundSettings[settingName] = !soundSettings[settingName];
-    document.getElementById(elementId).classList.toggle('active');
-    localStorage.setItem("fluppySoundSettings", JSON.stringify(soundSettings));
-    if (settingName === 'all') {
-        Object.keys(soundSettings).forEach(key => {
-            if (key !== 'all') soundSettings[key] = soundSettings.all;
-        });
-        updateAllToggles();
-    }
-}
-
-function updateAllToggles() {
-    Object.keys(soundSettings).forEach(key => {
-        if (key !== 'all') {
-            const toggle = document.getElementById(key + 'SoundToggle') || document.getElementById(key + 'Toggle');
-            if (toggle) toggle.classList.toggle('active', soundSettings[key]);
-        }
-    });
-}
-
-function preloadImages() {
-    return Promise.all(skins.map(skin => {
-        return new Promise((resolve) => {
-            birdImages[skin.name] = new Image();
-            birdImages[skin.name].onload = resolve;
-            birdImages[skin.name].onerror = () => {
-                birdImages[skin.name] = null;
-                resolve();
-            };
-            birdImages[skin.name].src = skin.file;
-        });
-    }));
-}
-
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-function resizeCanvas() { 
-    canvas.width = window.innerWidth; 
-    canvas.height = window.innerHeight; 
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+const skins = [
+    {name:"Bird", file:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyNSIgZmlsbD0iI2ZmYTAwMCIvPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjQiIGZpbGw9IiM0NDQiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjIwIiByPSI0IiBmaWxsPSIjNDQ0Ii8+PHBhdGggZD0iTTI1IDQwIEw1NSAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDQ0IiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4K", unlockScore:0, pipeColor:"#00c853", groundColor:"#8B4513"},
+    {name:"Mango", file:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyNSIgZmlsbD0iI2ZmYTgwMCIvPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjQiIGZpbGw9IiM0NDQiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjIwIiByPSI0IiBmaWxsPSIjNDQ0Ii8+PHBhdGggZD0iTTI1IDQwIEw1NSAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDQ0IiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4K", unlockScore:10, pipeColor:"#FFA500", groundColor:"#FFCC80"}
+];
 
 let gameState = { 
     bird: {x:100,y:200,width:60,height:60,velocity:0,rotation:0}, 
-    gravity: 0.4,
-    pipes:[],
-    score:0, 
-    highScore:parseInt(localStorage.getItem("fluppyHighScore"))||0,
-    gameOver:false, 
-    gameStarted:false, 
-    paused:false, 
-    basePipeSpeed:2.5,
-    currentPipeSpeed:2.5,
-    maxPipeSpeed:5,
-    difficulty:"Normal", 
-    animationId:null,
-    pipeSpacing: 420,
-    nextPipeDistance: 420,
-    speedProgress: 0
+    gravity: 0.4, pipes:[], score:0, highScore:0,
+    gameOver:false, gameStarted:false, paused:false, 
+    currentPipeSpeed:2.5, difficulty:"Normal", animationId:null,
+    pipeSpacing:420, nextPipeDistance:420
 };
 
+let selectedSkin = skins[0];
 let skinData = JSON.parse(localStorage.getItem("fluppySkins")) || {};
-skins.forEach(s => { if (!skinData[s.name]) skinData[s.name] = {unlocked: s.unlockScore === 0}; });
-let selectedSkinName = localStorage.getItem("selectedSkin") || "Bird";
-let selectedSkin = skins.find(s => s.name === selectedSkinName);
+let soundSettings = {all:true, bgmusic:true, score:true, fly:true};
 
 const elements = {
-    splashScreen: document.getElementById("splashScreen"),
-    okBtn: document.getElementById("okBtn"),
-    playBtn: document.getElementById("playBtn"),
-    settingsBtnMain: document.getElementById("settingsBtnMain"),
-    storeBtn: document.getElementById("storeBtn"),
-    backBtn: document.querySelector(".backBtn"),
-    backStoreBtn: document.querySelector(".backStoreBtn"),
-    pauseBtn: document.getElementById("pauseBtn"),
-    pauseResumeBtn: document.getElementById("pauseResumeBtn"),
-    pauseHomeBtn: document.getElementById("pauseHomeBtn"),
-    restartBtn: document.getElementById("restartBtn"),
-    homeBtn: document.getElementById("homeBtn"),
-    confirmSkinBtn: document.getElementById("confirmSkinBtn"),
-    upperSkinDisplay: document.getElementById("upperSkinDisplay"),
-    skinRow: document.getElementById("skinRow"),
-    titleScreen: document.getElementById("titleScreen"),
-    settingsScreen: document.getElementById("settingsScreen"),
-    storeScreen: document.getElementById("storeScreen"),
-    gameOverOverlay: document.getElementById("gameOverOverlay"),
-    finalScore: document.getElementById("finalScore")
+    splashScreen:document.getElementById("splashScreen"),
+    titleScreen:document.getElementById("titleScreen"),
+    settingsScreen:document.getElementById("settingsScreen"),
+    storeScreen:document.getElementById("storeScreen"),
+    gameOverOverlay:document.getElementById("gameOverOverlay"),
+    playBtn:document.getElementById("playBtn"),
+    settingsBtnMain:document.getElementById("settingsBtnMain"),
+    storeBtn:document.getElementById("storeBtn"),
+    okBtn:document.getElementById("okBtn"),
+    pauseBtn:document.getElementById("pauseBtn"),
+    pauseResumeBtn:document.getElementById("pauseResumeBtn"),
+    pauseHomeBtn:document.getElementById("pauseHomeBtn"),
+    restartBtn:document.getElementById("restartBtn"),
+    homeBtn:document.getElementById("homeBtn"),
+    finalScore:document.getElementById("finalScore")
 };
 
-const gapSizes = {
-    "Very Easy": 320,
-    "Normal": 260,
-    "Hard": 200
+const gapSizes = {"Very Easy":320,"Normal":260,"Hard":200};
+
+// SPLASH SCREEN
+elements.okBtn.onclick = () => {
+    elements.splashScreen.style.display = "none";
+    elements.titleScreen.style.display = "flex";
 };
 
-async function init() {
-    await preloadImages();
-    const savedDifficulty = localStorage.getItem("fluppyDifficulty") || "Normal";
-    gameState.difficulty = savedDifficulty;
-    document.querySelector(`input[name="difficulty"][value="${savedDifficulty}"]`).checked = true;
-    
-    updateAllToggles();
-    if (soundSettings.bgmusic) audio.bgmusic.play().catch(() => {});
-}
-
-elements.okBtn.onclick = () => { 
-    playSound('button'); 
-    elements.splashScreen.style.opacity = "0"; 
-    setTimeout(() => {
-        elements.splashScreen.style.display = "none";
-        elements.titleScreen.style.display = "flex";
-    }, 500); 
-};
-
-function initGame() {
-    gameState.bird = {x:100,y:200,width:60,height:60,velocity:0,rotation:0};
-    gameState.gravity = 0.4;
-    gameState.pipes = [];
-    gameState.score = 0;
-    gameState.gameOver = false;
-    gameState.paused = false;
-    gameState.gameStarted = false;
-    gameState.currentPipeSpeed = {"Very Easy":2.0,"Normal":2.5,"Hard":3.0}[gameState.difficulty];
-    gameState.basePipeSpeed = gameState.currentPipeSpeed;
-    gameState.nextPipeDistance = gameState.pipeSpacing;
-    gameState.speedProgress = 0;
-}
-
-function createPerfectPipe() {
-    const gapSize = gapSizes[gameState.difficulty];
-    const minHeight = 120;
-    const maxHeight = canvas.height - gapSize - minHeight - 80;
-    const pipeTopHeight = Math.random() * (maxHeight - minHeight) + minHeight;
-    
-    const pipe = {
-        x: canvas.width,
-        width: 70,
-        topHeight: pipeTopHeight,
-        gapSize: gapSize,
-        bottomHeight: canvas.height - pipeTopHeight - gapSize - 70,
-        passed: false,
-        scored: false
+// SETTINGS TABS
+document.querySelectorAll('.settingsTab').forEach(tab => {
+    tab.onclick = () => {
+        document.querySelectorAll('.settingsTab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#settingsRight > div').forEach(d => d.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab + 'Options').classList.add('active');
     };
-    
-    gameState.pipes.push(pipe);
-}
+});
 
-function updatePipeSpawning() {
-    gameState.nextPipeDistance -= gameState.currentPipeSpeed;
-    if (gameState.nextPipeDistance <= 0) {
-        createPerfectPipe();
-        gameState.nextPipeDistance = gameState.pipeSpacing;
-    }
-}
+// SOUND TOGGLES - FIXED
+['allSoundsToggle','bgMusicToggle','scoreSoundToggle','flySoundToggle'].forEach(id => {
+    const toggle = document.getElementById(id);
+    if(toggle) toggle.onclick = () => toggle.classList.toggle('active');
+});
 
+// DIFFICULTY - FIXED
+document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
+    radio.onchange = () => {
+        gameState.difficulty = radio.value;
+        gameState.currentPipeSpeed = {"Very Easy":2.0,"Normal":2.5,"Hard":3.0}[radio.value];
+        console.log("Difficulty:", gameState.difficulty); // Debug
+    };
+});
+
+// START GAME
 function startGame() {
-    playSound('button');
-    if (gameState.animationId) cancelAnimationFrame(gameState.animationId);
-    
-    // Hide all menus
     [elements.titleScreen, elements.settingsScreen, elements.storeScreen].forEach(el => el.style.display = "none");
-    [elements.restartBtn, elements.homeBtn, elements.pauseResumeBtn, elements.pauseHomeBtn].forEach(el => el.style.display = "none");
-    
     initGame();
     
-    let countdown = ["3","2","1","GO!"];
-    let countIndex = 0;
+    let countdown = 3;
     const overlay = document.createElement("div");
-    overlay.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:140px;color:yellow;text-shadow:4px 4px 0 black;background:rgba(0,0,0,0.7);z-index:1000;font-weight:bold;font-family:'Comic Sans MS', cursive;`;
+    overlay.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);color:yellow;font-size:140px;font-weight:bold;display:flex;align-items:center;justify-content:center;z-index:2001;";
     document.body.appendChild(overlay);
     
-    const interval = setInterval(() => {
-        overlay.textContent = countdown[countIndex];
-        if (countIndex < 3) playSound('countdown');
-        countIndex++;
-        if (countIndex >= countdown.length) {
-            clearInterval(interval);
-            playSound('go');
+    const timer = setInterval(() => {
+        overlay.textContent = countdown;
+        countdown--;
+        if(countdown < 0) {
+            clearInterval(timer);
             document.body.removeChild(overlay);
             elements.pauseBtn.style.display = "block";
             gameState.gameStarted = true;
             gameLoop();
         }
-    }, 700);
+    }, 800);
 }
 
-function endGame() {
-    playSound('gameover');
-    gameState.gameOver = true;
-    if (gameState.animationId) cancelAnimationFrame(gameState.animationId);
-    
-    if (gameState.score > gameState.highScore) {
-        gameState.highScore = gameState.score;
-        localStorage.setItem("fluppyHighScore", gameState.highScore);
-    }
-    
-    elements.finalScore.textContent = gameState.score;
-    elements.gameOverOverlay.style.display = "flex";
-    elements.gameOverOverlay.classList.add("show");
-    
-    elements.restartBtn.style.display = "block";
-    elements.homeBtn.style.display = "block";
-    elements.pauseBtn.style.display = "none";
-    
-    // Unlock skins
-    skins.forEach(s => { 
-        if (gameState.score >= s.unlockScore) {
-            skinData[s.name] = skinData[s.name] || {};
-            skinData[s.name].unlocked = true; 
-        }
+function initGame() {
+    gameState.bird = {x:100,y:200,width:60,height:60,velocity:0,rotation:0};
+    gameState.pipes = []; gameState.score = 0; gameState.gameOver = false;
+    gameState.paused = false; gameState.gameStarted = false;
+    gameState.nextPipeDistance = gameState.pipeSpacing;
+}
+
+function createPipe() {
+    const gapSize = gapSizes[gameState.difficulty];
+    const pipeTopHeight = 100 + Math.random() * (canvas.height - gapSize - 200);
+    gameState.pipes.push({
+        x: canvas.width, width: 70, topHeight: pipeTopHeight,
+        bottomHeight: canvas.height - pipeTopHeight - gapSize - 70, scored: false
     });
-    localStorage.setItem("fluppySkins", JSON.stringify(skinData));
 }
 
 function gameLoop() {
     gameState.animationId = requestAnimationFrame(gameLoop);
+    if(!gameState.gameStarted || gameState.gameOver || gameState.paused) return;
     
-    if (!gameState.gameStarted || gameState.gameOver || gameState.paused) return;
-    
-    gameState.speedProgress += gameState.currentPipeSpeed * 2;
-    if (gameState.speedProgress >= 100) {
-        gameState.speedProgress -= 100;
-    }
-    const displaySpeed = Math.floor(gameState.score * 100 + gameState.speedProgress);
-    
+    // Update bird
     gameState.bird.velocity += gameState.gravity;
     gameState.bird.y += gameState.bird.velocity;
     gameState.bird.rotation = Math.min(gameState.bird.velocity * 3, 25);
     
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     
-    // Background animation
-    if (Math.floor(gameState.score / 5) % 2 === 0) {
-        ctx.fillStyle = "skyblue"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#FFD700"; ctx.beginPath(); ctx.arc(canvas.width-120,100,45,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.beginPath(); 
-        ctx.arc(120,canvas.height-130,35,0,Math.PI*2); 
-        ctx.arc(150,canvas.height-150,45,0,Math.PI*2); 
-        ctx.arc(180,canvas.height-130,35,0,Math.PI*2); 
-        ctx.fill();
-    } else {
-        ctx.fillStyle = "#1a1a2e"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "white"; for (let i = 0; i < 40; i++) {
-            ctx.fillRect((i * 37) % canvas.width, (i * 23) % (canvas.height/2), 2, 2);
-        }
-        ctx.fillStyle = "#ffffcc"; ctx.beginPath(); ctx.arc(canvas.width-120,100,40,0,Math.PI*2); ctx.fill();
+    // Background
+    ctx.fillStyle = "skyblue"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    // Pipes
+    gameState.nextPipeDistance -= gameState.currentPipeSpeed;
+    if(gameState.nextPipeDistance <= 0) {
+        createPipe();
+        gameState.nextPipeDistance = gameState.pipeSpacing;
     }
     
-    updatePipeSpawning();
-    
-    // Update and draw pipes
-    for (let i = gameState.pipes.length - 1; i >= 0; i--) {
+    for(let i = gameState.pipes.length - 1; i >= 0; i--) {
         let pipe = gameState.pipes[i];
         pipe.x -= gameState.currentPipeSpeed;
         
@@ -461,27 +277,23 @@ function gameLoop() {
         ctx.fillRect(pipe.x, 0, pipe.width, pipe.topHeight);
         ctx.fillRect(pipe.x, canvas.height - pipe.bottomHeight - 70, pipe.width, pipe.bottomHeight);
         
-        // Collision detection
-        if (gameState.bird.x < pipe.x + pipe.width &&
-            gameState.bird.x + gameState.bird.width > pipe.x &&
-            (gameState.bird.y < pipe.topHeight || 
-             gameState.bird.y + gameState.bird.height > canvas.height - pipe.bottomHeight - 70)) {
+        // Collision
+        if(gameState.bird.x < pipe.x + pipe.width && 
+           gameState.bird.x + gameState.bird.width > pipe.x &&
+           (gameState.bird.y < pipe.topHeight || 
+            gameState.bird.y + gameState.bird.height > canvas.height - pipe.bottomHeight - 70)) {
             endGame();
             return;
         }
         
         // Score
-        if (!pipe.scored && pipe.x + pipe.width < gameState.bird.x) {
+        if(!pipe.scored && pipe.x + pipe.width < gameState.bird.x) {
             gameState.score++;
             pipe.scored = true;
-            playSound('score');
-            gameState.currentPipeSpeed = Math.min(gameState.currentPipeSpeed + 0.04, gameState.maxPipeSpeed);
+            gameState.currentPipeSpeed = Math.min(gameState.currentPipeSpeed + 0.02, 5);
         }
         
-        // Remove off-screen pipes
-        if (pipe.x + pipe.width < -50) {
-            gameState.pipes.splice(i, 1);
-        }
+        if(pipe.x + pipe.width < 0) gameState.pipes.splice(i, 1);
     }
     
     // Ground
@@ -490,192 +302,98 @@ function gameLoop() {
     ctx.fillRect(0, canvas.height-groundHeight, canvas.width, groundHeight);
     
     // Ground collision
-    if (gameState.bird.y + gameState.bird.height > canvas.height-groundHeight || gameState.bird.y < 0) {
+    if(gameState.bird.y + gameState.bird.height > canvas.height-70 || gameState.bird.y < 0) {
         endGame();
         return;
     }
     
     // Draw bird
     ctx.save();
-    ctx.translate(gameState.bird.x + gameState.bird.width/2, gameState.bird.y + gameState.bird.height/2);
+    ctx.translate(gameState.bird.x + 30, gameState.bird.y + 30);
     ctx.rotate(gameState.bird.rotation * Math.PI / 180);
-    if (birdImages[selectedSkin.name]) {
-        ctx.drawImage(birdImages[selectedSkin.name], -gameState.bird.width/2, -gameState.bird.height/2, gameState.bird.width, gameState.bird.height);
-    } else {
-        ctx.font = "bold 50px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillStyle = "orange";
-        ctx.fillText("🦜", 0, 0);
-    }
+    ctx.drawImage(new Image(), -30, -30, 60, 60); // Fallback emoji bird
     ctx.restore();
     
     // UI
-    ctx.fillStyle = "black"; 
-    ctx.font = "bold 32px Arial"; 
-    ctx.textAlign = "left";
+    ctx.fillStyle = "black"; ctx.font = "bold 32px Arial"; ctx.textAlign = "left";
     ctx.fillText(`Score: ${gameState.score}`, 25, 60);
-    ctx.fillText(`High: ${gameState.highScore}`, 25, 105);
-    ctx.fillText(`Speed: ${displaySpeed}`, 25, 145);
+    ctx.fillText(`High: ${gameState.highScore}`, 25, 100);
 }
 
-function jump() { 
-    if (gameState.gameStarted && !gameState.gameOver && !gameState.paused) { 
-        gameState.bird.velocity = -7.5;
-        gameState.bird.rotation = -25;
-        playSound('fly');
-    } 
-}
-
-// Controls
-document.addEventListener("click", (e) => {
-    const menus = ['titleScreen', 'settingsScreen', 'storeScreen', 'gameOverOverlay'];
-    if (!menus.some(id => e.target.closest('#' + id))) jump();
-});
-document.addEventListener("touchstart", e => { e.preventDefault(); jump(); });
-document.addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); jump(); } });
-
-// Settings tabs
-document.querySelectorAll('.settingsTab').forEach(tab => {
-    tab.onclick = () => {
-        playSound('button');
-        document.querySelectorAll('.settingsTab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.querySelectorAll('#settingsRight > div').forEach(div => div.classList.remove('active'));
-        document.getElementById(tab.dataset.tab + 'Options').classList.add('active');
-    };
-});
-
-// Sound toggles - FIXED
-['allSoundsToggle', 'bgMusicToggle', 'scoreSoundToggle', 'flySoundToggle', 'countdownSoundToggle', 'buttonSoundToggle', 'gameoverSoundToggle'].forEach(id => {
-    const toggle = document.getElementById(id);
-    if (toggle) {
-        toggle.onclick = () => {
-            const settingName = id.replace('Toggle', '').toLowerCase();
-            toggleAudio(id, settingName === 'allsounds' ? 'all' : settingName);
-        };
+function endGame() {
+    gameState.gameOver = true;
+    if(gameState.animationId) cancelAnimationFrame(gameState.animationId);
+    
+    if(gameState.score > gameState.highScore) {
+        gameState.highScore = gameState.score;
+        localStorage.setItem("fluppyHighScore", gameState.highScore);
     }
-});
+    
+    elements.finalScore.textContent = gameState.score;
+    elements.gameOverOverlay.style.display = "flex";
+    setTimeout(() => elements.gameOverOverlay.classList.add("show"), 100);
+    
+    elements.restartBtn.style.display = "block";
+    elements.homeBtn.style.display = "block";
+    elements.pauseBtn.style.display = "none";
+}
 
-// Difficulty radio buttons - FIXED
-document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
-    radio.onchange = () => {
-        playSound('button');
-        gameState.difficulty = radio.value;
-        gameState.currentPipeSpeed = {"Very Easy":2.0,"Normal":2.5,"Hard":3.0}[radio.value];
-        gameState.basePipeSpeed = gameState.currentPipeSpeed;
-        localStorage.setItem("fluppyDifficulty", radio.value);
-    };
-});
+function jump() {
+    if(gameState.gameStarted && !gameState.gameOver && !gameState.paused) {
+        gameState.bird.velocity = -8;
+        gameState.bird.rotation = -20;
+    }
+}
 
-// Button events
+// BUTTONS - ALL FIXED
 elements.playBtn.onclick = startGame;
-elements.settingsBtnMain.onclick = () => { playSound('button'); elements.titleScreen.style.display = "none"; elements.settingsScreen.style.display = "flex"; };
-elements.backBtn.onclick = () => { playSound('button'); elements.settingsScreen.style.display = "none"; elements.titleScreen.style.display = "flex"; };
-elements.storeBtn.onclick = () => { playSound('button'); elements.titleScreen.style.display = "none"; elements.storeScreen.style.display = "flex"; renderSkins(); };
-elements.backStoreBtn.onclick = () => { playSound('button'); elements.storeScreen.style.display = "none"; elements.titleScreen.style.display = "flex"; };
+elements.settingsBtnMain.onclick = () => { elements.titleScreen.style.display="none"; elements.settingsScreen.style.display="flex"; };
+document.querySelector('.backBtn').onclick = () => { elements.settingsScreen.style.display="none"; elements.titleScreen.style.display="flex"; };
+elements.storeBtn.onclick = () => { elements.titleScreen.style.display="none"; elements.storeScreen.style.display="flex"; };
+document.querySelector('.backStoreBtn').onclick = () => { elements.storeScreen.style.display="none"; elements.titleScreen.style.display="flex"; };
 
-function renderSkins() {
-    elements.skinRow.innerHTML = "";
-    elements.upperSkinDisplay.innerHTML = "";
-    
-    const previewImg = document.createElement("img");
-    previewImg.src = selectedSkin.file;
-    previewImg.onerror = () => previewImg.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZhbGxiYWNrPC90ZXh0Pjwvc3ZnPg==";
-    elements.upperSkinDisplay.appendChild(previewImg);
-
-    skins.forEach(s => {
-        const box = document.createElement("div");
-        box.className = "skinBox" + (s.name === selectedSkin.name ? " selected" : "");
-        
-        const img = document.createElement("img");
-        img.src = s.file;
-        img.onerror = () => img.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZhbGxiYWNrPC90ZXh0Pjwvc3ZnPg==";
-        box.appendChild(img);
-        
-        const nameDiv = document.createElement("div"); nameDiv.className = "name"; nameDiv.textContent = s.name; box.appendChild(nameDiv);
-        const priceDiv = document.createElement("div"); priceDiv.className = "price"; priceDiv.textContent = `${s.unlockScore} pts`; box.appendChild(priceDiv);
-        
-        const overlay = document.createElement("div"); overlay.className = "lockOverlay";
-        if (!skinData[s.name]?.unlocked) overlay.textContent = "🔒"; else overlay.style.display = "none";
-        box.appendChild(overlay);
-        
-        box.onclick = () => {
-            playSound('button');
-            if (skinData[s.name]?.unlocked) {
-                selectedSkin = s;
-                selectedSkinName = s.name;
-                renderSkins();
-                elements.confirmSkinBtn.className = "confirmBtn unlocked";
-            }
-        };
-        elements.skinRow.appendChild(box);
-    });
-    
-    elements.confirmSkinBtn.className = skinData[selectedSkin.name]?.unlocked ? "confirmBtn unlocked" : "confirmBtn locked";
-}
-
-elements.confirmSkinBtn.onclick = () => {
-    playSound('button');
-    if (elements.confirmSkinBtn.classList.contains("unlocked")) {
-        localStorage.setItem("selectedSkin", selectedSkin.name);
-        elements.storeScreen.style.display = "none";
-        elements.titleScreen.style.display = "flex";
-    }
-};
-
-// Pause/Resume buttons
+// PAUSE
 elements.pauseBtn.onclick = () => {
-    playSound('button');
-    gameState.paused = !gameState.paused;
-    if (gameState.paused) {
-        elements.pauseBtn.style.display = "none";
-        elements.pauseResumeBtn.style.display = "block";
-        elements.pauseHomeBtn.style.display = "block";
-    } else {
-        elements.pauseResumeBtn.style.display = "none";
-        elements.pauseHomeBtn.style.display = "none";
-        elements.pauseBtn.style.display = "block";
-    }
+    gameState.paused = true;
+    elements.pauseBtn.style.display = "none";
+    elements.pauseResumeBtn.style.display = "block";
+    elements.pauseHomeBtn.style.display = "block";
 };
-
 elements.pauseResumeBtn.onclick = () => {
-    playSound('button');
     gameState.paused = false;
     elements.pauseResumeBtn.style.display = "none";
     elements.pauseHomeBtn.style.display = "none";
     elements.pauseBtn.style.display = "block";
 };
-
 elements.pauseHomeBtn.onclick = () => {
-    playSound('button');
-    if (gameState.animationId) cancelAnimationFrame(gameState.animationId);
     elements.titleScreen.style.display = "flex";
     [elements.pauseBtn, elements.pauseResumeBtn, elements.pauseHomeBtn].forEach(el => el.style.display = "none");
-    gameState.gameOver = true;
-    gameState.paused = false;
 };
 
-// FIXED RESTART BUTTON
+// GAME OVER BUTTONS - FIXED Z-INDEX
 elements.restartBtn.onclick = () => {
-    playSound('button');
     elements.gameOverOverlay.classList.remove("show");
     elements.gameOverOverlay.style.display = "none";
+    [elements.restartBtn, elements.homeBtn].forEach(el => el.style.display = "none");
     startGame();
 };
 
-// FIXED HOME BUTTON
 elements.homeBtn.onclick = () => {
-    playSound('button');
-    if (gameState.animationId) cancelAnimationFrame(gameState.animationId);
     elements.gameOverOverlay.classList.remove("show");
     elements.gameOverOverlay.style.display = "none";
     elements.titleScreen.style.display = "flex";
-    [elements.restartBtn, elements.homeBtn, elements.pauseBtn].forEach(el => el.style.display = "none");
-    gameState.gameOver = true;
-    gameState.paused = false;
+    [elements.restartBtn, elements.homeBtn].forEach(el => el.style.display = "none");
 };
 
-// Initialize
-init();
+// CONTROLS
+document.addEventListener("click", e => {
+    if(!e.target.closest('#splashScreen, #titleScreen, #settingsScreen, #storeScreen, #gameOverOverlay')) jump();
+});
+document.addEventListener("keydown", e => { if(e.code === "Space") { e.preventDefault(); jump(); } });
+
+// START
+elements.titleScreen.style.display = "flex";
+gameState.highScore = parseInt(localStorage.getItem("fluppyHighScore")) || 0;
 </script>
 </body>
 </html>
