@@ -4,14 +4,15 @@ const soundSettings = JSON.parse(localStorage.getItem("fluppySoundSettings")) ||
 };
 
 const audio = {
-    countdown: new Audio('sounds/countdown.mp3'),
-    go: new Audio('sounds/go.mp3'),
-    fly: new Audio('sounds/fly.mp3'),
-    button: new Audio('sounds/button.mp3'),
-    score: new Audio('sounds/score.mp3'),
-    gameover: new Audio('sounds/gameover.mp3'),
-    bgmusic: new Audio('sounds/bgmusic.mp3')
+    countdown: new Audio('countdown_sound.mp3'),
+    go: new Audio('Go_sound.mp3'),
+    fly: new Audio('bird_fly_sound.mp3'),
+    button: new Audio('bottons_sound.mp3'),
+    score: new Audio('coine_sound.mp3'),
+    gameover: new Audio('game_over_sound.mp3'),
+    bgmusic: new Audio('game_bg_sound.mp3')
 };
+
 audio.bgmusic.loop = true;
 
 function playSound(soundName) {
