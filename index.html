@@ -92,8 +92,8 @@ canvas{ display:block; }
     background: linear-gradient(45deg, rgba(0,0,0,0.9), rgba(139,69,19,0.8)); 
     display:none; flex-direction:column; align-items:center; justify-content:center; 
     z-index:250; color:#FFD700; text-shadow: 3px 3px 0 #000; font-family: 'Comic Sans MS', cursive;
-    opacity:0; transition:opacity 0.8s ease-out;
 }
+#gameOverOverlay.show{ opacity:1; }
 #gameOverOverlay h2{ 
     font-size:80px; margin:0; text-shadow: 5px 5px 0 #000, 10px 10px 0 orange; 
     animation: glow 2s ease-in-out infinite alternate; 
@@ -215,7 +215,7 @@ function toggleAudio(elementId, settingName) {
 function updateAllToggles() {
     Object.keys(soundSettings).forEach(key => {
         if (key !== 'all') {
-            const toggle = document.getElementById(key + 'Toggle');
+            const toggle = document.getElementById(key + 'SoundToggle') || document.getElementById(key + 'Toggle');
             if (toggle) toggle.classList.toggle('active', soundSettings[key]);
         }
     });
@@ -307,10 +307,14 @@ async function init() {
     if (soundSettings.bgmusic) audio.bgmusic.play().catch(() => {});
 }
 
-elements.okBtn.onclick = () => { playSound('button'); elements.splashScreen.style.opacity = "0"; setTimeout(() => {
-    elements.splashScreen.style.display = "none";
-    elements.titleScreen.style.display = "flex";
-}, 500); };
+elements.okBtn.onclick = () => { 
+    playSound('button'); 
+    elements.splashScreen.style.opacity = "0"; 
+    setTimeout(() => {
+        elements.splashScreen.style.display = "none";
+        elements.titleScreen.style.display = "flex";
+    }, 500); 
+};
 
 function initGame() {
     gameState.bird = {x:100,y:200,width:60,height:60,velocity:0,rotation:0};
@@ -357,8 +361,9 @@ function startGame() {
     playSound('button');
     if (gameState.animationId) cancelAnimationFrame(gameState.animationId);
     
+    // Hide all menus
     [elements.titleScreen, elements.settingsScreen, elements.storeScreen].forEach(el => el.style.display = "none");
-    [elements.restartBtn, elements.homeBtn, elements.pauseBtn, elements.pauseResumeBtn, elements.pauseHomeBtn].forEach(el => el.style.display = "none");
+    [elements.restartBtn, elements.homeBtn, elements.pauseResumeBtn, elements.pauseHomeBtn].forEach(el => el.style.display = "none");
     
     initGame();
     
@@ -382,7 +387,8 @@ function startGame() {
         }
     }, 700);
 }
-    function endGame() {
+
+function endGame() {
     playSound('gameover');
     gameState.gameOver = true;
     if (gameState.animationId) cancelAnimationFrame(gameState.animationId);
@@ -394,14 +400,11 @@ function startGame() {
     
     elements.finalScore.textContent = gameState.score;
     elements.gameOverOverlay.style.display = "flex";
-    elements.gameOverOverlay.style.opacity = "0";
+    elements.gameOverOverlay.classList.add("show");
     
-    setTimeout(() => {
-        elements.gameOverOverlay.style.opacity = "1";
-        elements.restartBtn.style.display = "block";
-        elements.homeBtn.style.display = "block";
-        elements.pauseBtn.style.display = "none";
-    }, 100);
+    elements.restartBtn.style.display = "block";
+    elements.homeBtn.style.display = "block";
+    elements.pauseBtn.style.display = "none";
     
     // Unlock skins
     skins.forEach(s => { 
@@ -541,24 +544,18 @@ document.querySelectorAll('.settingsTab').forEach(tab => {
     };
 });
 
-// Sound toggles - FIXED IDs
+// Sound toggles - FIXED
 ['allSoundsToggle', 'bgMusicToggle', 'scoreSoundToggle', 'flySoundToggle', 'countdownSoundToggle', 'buttonSoundToggle', 'gameoverSoundToggle'].forEach(id => {
     const toggle = document.getElementById(id);
     if (toggle) {
         toggle.onclick = () => {
-            const settingName = id.replace('Toggle', '');
-            toggleAudio(id, settingName === 'allSounds' ? 'all' : settingName);
+            const settingName = id.replace('Toggle', '').toLowerCase();
+            toggleAudio(id, settingName === 'allsounds' ? 'all' : settingName);
         };
     }
 });
 
-// Button events
-elements.playBtn.onclick = startGame;
-elements.settingsBtnMain.onclick = () => { playSound('button'); elements.titleScreen.style.display = "none"; elements.settingsScreen.style.display = "flex"; };
-elements.backBtn.onclick = () => { playSound('button'); elements.settingsScreen.style.display = "none"; elements.titleScreen.style.display = "flex"; };
-elements.storeBtn.onclick = () => { playSound('button'); elements.titleScreen.style.display = "none"; elements.storeScreen.style.display = "flex"; renderSkins(); };
-elements.backStoreBtn.onclick = () => { playSound('button'); elements.storeScreen.style.display = "none"; elements.titleScreen.style.display = "flex"; };
-
+// Difficulty radio buttons - FIXED
 document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
     radio.onchange = () => {
         playSound('button');
@@ -568,6 +565,13 @@ document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
         localStorage.setItem("fluppyDifficulty", radio.value);
     };
 });
+
+// Button events
+elements.playBtn.onclick = startGame;
+elements.settingsBtnMain.onclick = () => { playSound('button'); elements.titleScreen.style.display = "none"; elements.settingsScreen.style.display = "flex"; };
+elements.backBtn.onclick = () => { playSound('button'); elements.settingsScreen.style.display = "none"; elements.titleScreen.style.display = "flex"; };
+elements.storeBtn.onclick = () => { playSound('button'); elements.titleScreen.style.display = "none"; elements.storeScreen.style.display = "flex"; renderSkins(); };
+elements.backStoreBtn.onclick = () => { playSound('button'); elements.storeScreen.style.display = "none"; elements.titleScreen.style.display = "flex"; };
 
 function renderSkins() {
     elements.skinRow.innerHTML = "";
@@ -650,10 +654,20 @@ elements.pauseHomeBtn.onclick = () => {
     gameState.paused = false;
 };
 
-elements.restartBtn.onclick = startGame;
+// FIXED RESTART BUTTON
+elements.restartBtn.onclick = () => {
+    playSound('button');
+    elements.gameOverOverlay.classList.remove("show");
+    elements.gameOverOverlay.style.display = "none";
+    startGame();
+};
+
+// FIXED HOME BUTTON
 elements.homeBtn.onclick = () => {
     playSound('button');
     if (gameState.animationId) cancelAnimationFrame(gameState.animationId);
+    elements.gameOverOverlay.classList.remove("show");
+    elements.gameOverOverlay.style.display = "none";
     elements.titleScreen.style.display = "flex";
     [elements.restartBtn, elements.homeBtn, elements.pauseBtn].forEach(el => el.style.display = "none");
     gameState.gameOver = true;
